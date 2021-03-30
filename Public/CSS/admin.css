@@ -11,8 +11,11 @@ html,body
     height: 60px;
     padding-left: 550px;
 }
-  .sidenav {
-    height: 571px;
+  .sidenav { 
+    position: fixed;
+    height: 100%;
+    width: 25%;
+    overflow-y: auto;
     background-color: #111;
     padding-top: 20px;
   }
