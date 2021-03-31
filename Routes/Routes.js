@@ -66,7 +66,7 @@ Router.post('/addcandi', ((req, res) => {
     console.log(req.body.department);
     if (req.body.name && req.body.id && req.body.department!=="Department") {
         const candidate = new Candidate(req.body);
-        Candidate.findOne({ name: req.body.name }, (err, response) => {
+        Candidate.findOne({ id: req.body.id }, (err, response) => {
             if (err || !response) {
                 candidate.save();
             }
