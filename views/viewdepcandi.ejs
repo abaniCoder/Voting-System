@@ -84,7 +84,7 @@
                      <td><%= candi.name %></td>
                      <td><%= candi.id%></td>
                      <td>
-                         <a href="/delete/candidate" onclick="location.href=this.href+'?name=<%=candi.name%>';return false;"><button class="btn btn-primary">Delete</button></a>
+                         <a href="/delete/candidate" onclick="location.href=this.href+'?id=<%=candi.id%>&department=<%=department%>';return false;"><button class="btn btn-primary">Delete</button></a>
                      </td>
                  </tr> 
                  <% } ) %>

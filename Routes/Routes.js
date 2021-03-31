@@ -41,10 +41,11 @@ Router.get('/delete', (req,res) => {
     });
 })
 //delete candidate route 
-Router.get('/delete', (req,res) => {
+Router.get('/delete/candidate', (req,res) => {
     console.log(req.query);
-    Candidate.deleteOne({ department: req.query.name }, (err, response) => {
-    }); 
+    Candidate.deleteOne({ id: req.query.id}, (err, response) => {
+    });
+    res.redirect('/viewcandidates/?department=' + req.query.department);
    
 })
 //add candidate
@@ -103,12 +104,14 @@ Router.get('/admin',((req,res)=>{
 //view candidates under a departemnt
 Router.get('/viewcandidates', (req, res) => {
     const dept = req.query.department;
-    Candidate.find({ department: req.query.department }, (err, candidate) => {
+    Candidate.find({ department: dept }, (err, candidate) => {
         if (err || !candidate) {
             //do some stuff
             res.render('viewdepcandi', { department: dept, candidates: [],error:true });
         }
         else {
+            console.log(candidate,dept);
+
             res.render('viewdepcandi', { department: dept, candidates: candidate,error:false });
         }
     })
