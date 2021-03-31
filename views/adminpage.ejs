@@ -18,9 +18,9 @@
     <div class="row ">
         <div class="col-3">
             <div class="sidenav">
-                <a href="#about">Add Department</a>
-                <a href="#services">Add Candidate</a>
-                <a href="#clients">View Department</a>
+                <a href="/adddept">Add Department</a>
+                <a href="/addcandi">Add Candidate</a>
+                <a href="/admin">View Department</a>
             </div>
         </div>
         <div class="col-6">
@@ -29,18 +29,23 @@
                   <tr>
                       <th>#</th>
                       <th>Department</th>
+                      <th>Date</th>
                       <th>Action</th>
                   </tr>
                </thead>
-               <tbody>
+               <tbody> 
+                 
+                  <%  !error && department.forEach((depts,index)=> { %>
                  <tr>
-                     <td>1</td>
-                     <td>Chutiyapa</td>
+                     <td><%= index+1 %></td>
+                     <td><%= depts.name %></td>
+                     <td><%= depts.date %></td>
                      <td>
-                         <button class="btn btn-primary">Delete</button>
-                         <button class="btn btn-primary">View</button>
+                         <a href="/delete/" onclick="location.href=this.href+'?name=<%=depts.name%>';return false;"><button class="btn btn-primary">Delete</button></a>
+                         <a href="/viewcandidates/" onclick="location.href=this.href+'?department=<%=depts.name%>';return false;"><button class="btn btn-primary">View</button></a>
                      </td>
-                 </tr>
+                 </tr> 
+                 <% } ) %>
                </tbody>
               </table>
         </div>
