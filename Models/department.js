@@ -8,6 +8,10 @@ const departmentSchema = mongoose.Schema({
     , date: {
         type: String,
         require:true
+    } ,
+    selected : {
+        type : Boolean ,
+        default: false
     }
 })
 

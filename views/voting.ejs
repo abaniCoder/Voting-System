@@ -25,21 +25,24 @@
                 <a href="/voting">Voting</a>
             </div>
         </div>
-        <div class="col-6" >
-            <div class="deptform"> 
-               <h3> <%= error %> </h3>
+        <div class="col-6 add-scroll" >
+          
+               <h3> <%= msg %> </h3> 
+               <%!error && votingcandidates.forEach((value,key)=>{ %>  
+               
+                <div class="deptform"> 
+                <div> <h4><%= key %> </h4></div> 
                 <form method="POST">
-                <div class="mb-3">
-                    <label for="exampleInputEmail1" class="form-label">Department Name</label>
-                    <input type="text" class="form-control" id="exampleInputEmail1" name ="name"aria-describedby="emailHelp" autocomplete="off">
-                  </div>
-                  <div class="mb-3">
-                    <label for="exampleInputEmail1" class="form-label">Voting Date</label>
-                    <input type="date" class="form-control" id="exampleInputEmail1" name="date" aria-describedby="emailHelp">
-                  </div>     
-                  <button class="btn btn-success">Submit</button>        
-                </form>               
+                 <% value.forEach((candi,index)=>{ %> 
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="select" value="<%=candi.name%>" id="flexCheckDefault">
+                        <label class="form-check-label">
+                         <h6><%=candi.name%> </h6>
+                        </label>
+                      </div>
+                <%})%> <button class="btn btn-success">Vote</button></form> 
             </div>
+                <%})%>         
         </div>
     </div>
     

@@ -36,5 +36,12 @@ html,body
   padding: 50px;
   margin: 70px;
   border-radius: 15px ;
-  background-color:#babab6;
+  background-color:#babab6;  
+}
+.add-scroll{
+  max-height:600px; 
+  overflow-y: auto;
+}
+.voting-name-align{
+  margin-left: 10px;
 }

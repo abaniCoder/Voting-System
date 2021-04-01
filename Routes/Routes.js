@@ -117,4 +117,66 @@ Router.get('/viewcandidates', (req, res) => {
     })
 }) 
 
+//organise poll 
+Router.get("/organisepol" ,(req,res)=>{ 
+    console.log(req.body) ;
+    Dept.find((err, response) => {
+        console.log(response);
+        if (err || response.length === 0) {
+            console.log(response);
+           res.render('organise', { department: [] ,error: true  ,mssg:"No Department Found" });
+        }
+        else {
+            res.render('organise', { department: response,error:false ,msg:'' });
+        }
+    })
+}) 
+
+Router.post("/organisepol" ,(req,res)=>{ 
+    console.log(req.body) ; 
+    Dept.findOneAndUpdate({name:req.body.select},{selected:true},(err,response)=>{
+        if(err||!response){
+            res.redirect("/organisepol") ;
+        } 
+        else {
+            res.redirect("/voting") ;
+        }
+    })
+   
+})
+// voting route
+const votingCandidates = new Map() ; 
+Router.get("/voting",(req,res)=>{ 
+    //Get department from database 
+    //Also get its coresponding candidates 
+    
+    Dept.find({selected:true},(err,dept)=>{ 
+        console.log(dept) ;
+        if(err||!dept) { 
+            console.log("OK") ;
+            res.render("voting" , {votingcandidates: votingCandidates, error : true ,msg :"No Poll Found"}) ;
+        }
+        else { 
+            console.log("else");
+            dept.forEach((department)=>{ 
+                Candidate.find({department:department.name},(err,candidates)=>{
+                    if(err||!candidates){
+                        // pair department with an empty list of candidates
+                        votingCandidates.set(department.name,[]) ;
+                    }
+                    else { 
+                        console.log("cadi" , candidates); 
+                        votingCandidates.set(department.name,candidates) ;
+                        console.log("im",votingCandidates);
+                    } 
+                }
+                ) 
+                })
+                console.log(votingCandidates);   
+          
+            res.render('voting',{votingcandidates:votingCandidates,error:false,msg:''}) ;
+        }
+    })
+       // res.render('voting')
+})
 module.exports = Router ;
