@@ -3,13 +3,50 @@ const express = require('express') ;
 const Candidate = require("../Models/candidate");
 const Router = express.Router();
 const Dept = require('../Models/department');
+const User= require("../Models/user"); 
+//Home route 
 Router.get('/',(req,res)=>{
-    res.render('adddept' ,{error:''});
+    res.render('index' ,{msg:''});
+}) 
+
+Router.post('/',(req,res)=>{  
+    console.log("ok")
+    if(!req.body.id||!req.body.password){
+        console.log("ok1")
+        res.render('index',{msg :"Empty Fields"}) ;
+    } else {
+     User.findOne({id:req.body.id},(err,user)=>{ 
+         if(err||!user || user.password !==req.body.password){
+             res.render('index',{msg :"Credentials  didnt match"}) ;
+         }  
+         else{ 
+             if(user.role===true){
+                 res.redirect('/admin') ;
+             } else {
+             res.redirect('/user?id='+user.id) ;
+             }
+         }
+     }) } 
 })
+
 //register routes
 Router.get('/register',((req,res)=>{ 
-res.render('register') ;
+res.render('register',{error:""}) ;
 }))
+Router.post('/register',((req,res)=>{
+    const user=new User(req.body); 
+    User.findOne({id:req.body.id},(err,response)=>{
+            if(err||!response){
+                // save new user 
+                user.save() ; 
+                res.redirect("/user/?id="+req.body.id) ;
+            } 
+            else {
+                res.render('register',{error:"Already Exist"}) ;
+            }
+    })
+}))
+
 //add department routes
 Router.get('/adddept',((req,res)=>{ 
     res.render('adddept',{ error: "" }) ;
@@ -154,7 +191,7 @@ Router.get("/voting",(req,res)=>{
         console.log(dept) ;
         if(err||!dept) { 
             console.log("OK") ;
-            res.render("voting" , {votingcandidates: votingCandidates, error : true ,msg :"No Poll Found"}) ;
+            res.render("voting" , {votingcandidates: votingCandidates, error : true ,msg :"No Poll Found" ,id:req.query.id}) ;
         }
         else { 
             console.log("else");
@@ -174,9 +211,21 @@ Router.get("/voting",(req,res)=>{
                 })
                 console.log(votingCandidates);   
           
-            res.render('voting',{votingcandidates:votingCandidates,error:false,msg:''}) ;
+            res.render('voting',{votingcandidates:votingCandidates,error:false,msg:'',id:req.query.id}) ;
         }
     })
        // res.render('voting')
+})
+//user route
+Router.get("/user",(req,res)=>{  
+    User.findOne({id:req.query.id},(err,user)=>{
+           if(err||!user){
+               //run kro
+           } 
+           else {
+            res.render('userpage',{email:user.email,id:user.id,name:user.name}) ;
+           }
+    })
+
 })
 module.exports = Router ;
