@@ -14,7 +14,9 @@ const userSchema = mongoose.Schema({
         require:true
     },
     voted: {
-        type: Map
+        type: Map,
+        of: String,
+        default: { '': ''}
     },
     email: {
         type: String,

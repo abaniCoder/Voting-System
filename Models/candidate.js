@@ -12,6 +12,10 @@ const candidateSchema = mongoose.Schema({
     department: {
         type: String,
         require:true
+    },
+    points: {
+        type: Number,
+        default:0 
     }
 })
 

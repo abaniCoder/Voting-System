@@ -1,9 +1,12 @@
 const { response } = require('express');
 const express = require('express') ;
+const { mapReduce } = require('../Models/candidate');
 const Candidate = require("../Models/candidate");
 const Router = express.Router();
+const User= require('../Models/user'); 
 const Dept = require('../Models/department');
-const User= require("../Models/user"); 
+const { loadVotingCandidates} = require("../Helper/helper")
+
 //Home route 
 Router.get('/',(req,res)=>{
     res.render('index' ,{msg:''});
@@ -72,10 +75,13 @@ Router.post('/adddept', ((req, res) => {
 Router.get('/delete', (req,res) => {
     console.log(req.query);
     Candidate.deleteMany({ department: req.query.name }, (err, response) => {
-    }); 
-    Dept.deleteOne({ name: req.query.name }, (err, response) => {
-                res.redirect("/admin")
     });
+    console.log(req.query.name);
+    Dept.findOneAndDelete({ name:req.query.name}, function (err) {
+         if(err) console.log(err);
+         console.log("Successful deletion");
+    });
+    res.redirect('/admin');
 })
 //delete candidate route 
 Router.get('/delete/candidate', (req,res) => {
@@ -157,13 +163,14 @@ Router.get('/viewcandidates', (req, res) => {
 //organise poll 
 Router.get("/organisepol" ,(req,res)=>{ 
     console.log(req.body) ;
-    Dept.find((err, response) => {
-        console.log(response);
-        if (err || response.length === 0) {
-            console.log(response);
-           res.render('organise', { department: [] ,error: true  ,mssg:"No Department Found" });
+    Dept.find({selected:false},(err, response) => {
+       // console.log(response);
+        if (err || response.length===0) {
+            console.log("this");
+           res.render('organise', { department: [] ,error: true  ,msg:"No Department Found" });
         }
         else {
+            console.log("thione")
             res.render('organise', { department: response,error:false ,msg:'' });
         }
     })
@@ -176,46 +183,43 @@ Router.post("/organisepol" ,(req,res)=>{
             res.redirect("/organisepol") ;
         } 
         else {
-            res.redirect("/voting") ;
+            res.redirect("/admin") ;
         }
     })
    
 })
 // voting route
-const votingCandidates = new Map() ; 
-Router.get("/voting",(req,res)=>{ 
+
+Router.get("/voting", async(req, res) => {
     //Get department from database 
-    //Also get its coresponding candidates 
-    
-    Dept.find({selected:true},(err,dept)=>{ 
-        console.log(dept) ;
-        if(err||!dept) { 
-            console.log("OK") ;
-            res.render("voting" , {votingcandidates: votingCandidates, error : true ,msg :"No Poll Found" ,id:req.query.id}) ;
-        }
-        else { 
-            console.log("else");
-            dept.forEach((department)=>{ 
-                Candidate.find({department:department.name},(err,candidates)=>{
-                    if(err||!candidates){
-                        // pair department with an empty list of candidates
-                        votingCandidates.set(department.name,[]) ;
-                    }
-                    else { 
-                        console.log("cadi" , candidates); 
-                        votingCandidates.set(department.name,candidates) ;
-                        console.log("im",votingCandidates);
-                    } 
-                }
-                ) 
-                })
-                console.log(votingCandidates);   
-          
-            res.render('voting',{votingcandidates:votingCandidates,error:false,msg:'',id:req.query.id}) ;
-        }
-    })
-       // res.render('voting')
+    //Also get its coresponding candidates  
+    //Bug 
+    // console.log(req.query.id)
+   
+    var votingCandidates = new Map();
+    votingCandidates =  await loadVotingCandidates(req.query.id);
+    res.render('voting', { votingcandidates: votingCandidates, error: false, msg: '', id: req.query.id });   
+        
 })
+
+    Router.post('/voting', async(req,res) => {
+        console.log(req.body);
+       await User.findOne({ id: req.query.id },async (err,user) => {
+            if (err || !user) {
+                //Do some stuff
+            }
+            else {
+                user.voted.set(req.body.select,req.body.select);
+               await user.save();
+               await Candidate.findOne({ id: req.body.id }, async(err,candidate) => {
+                    candidate.points += 1;
+                   await candidate.save();
+                }) 
+                res.redirect('/voting/?id=' + req.query.id);
+            }
+        })
+    })
+
 //user route
 Router.get("/user",(req,res)=>{  
     User.findOne({id:req.query.id},(err,user)=>{
@@ -226,6 +230,6 @@ Router.get("/user",(req,res)=>{
             res.render('userpage',{email:user.email,id:user.id,name:user.name}) ;
            }
     })
-
 })
+
 module.exports = Router ;
